@@ -19,7 +19,7 @@ class dbController {
 
   Future<Database> initDataBase() async {
     io.Directory dir = await getApplicationDocumentsDirectory();
-    String path = join(dir.toString(), "mydatabase.db");
+    String path = join(dir.toString(), "mydatabases.db");
 
     var db = await openDatabase(path, version: 1, onCreate: (db, version) {
       String sql =
@@ -89,6 +89,7 @@ class dbController {
     var dbClient = await db;
     await dbClient!.insert("tasks", tasks.toJson());
     debugPrint("tasks" + tasks.toString());
+    debugPrint(jsonEncode(tasks));
     return tasks;
   }
 }

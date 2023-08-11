@@ -37,16 +37,26 @@ class appBar extends StatelessWidget implements PreferredSizeWidget {
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Container(
-                    child: Icon(Icons.task),
-                    color:
-                        p.getCurrentPageIndex(0) ? Colors.orange : Colors.black,
+                  InkWell(
+                    onTap: (){
+                      p.changePageOnTap(0);
+                    },
+                    child: Container(
+                      child: Icon(Icons.task),
+                      color:
+                          p.getCurrentPageIndex(0) ? Colors.orange : Colors.black,
+                    ),
                   ),
-                  Container(
-                    color:
-                        p.getCurrentPageIndex(1) ? Colors.orange : Colors.black,
-                    child: Icon(
-                      Icons.check_box,
+                  InkWell(
+                    onTap: (){
+                      p.changePageOnTap(1);
+                    },
+                    child: Container(
+                      color:
+                          p.getCurrentPageIndex(1) ? Colors.orange : Colors.black,
+                      child: Icon(
+                        Icons.check_box,
+                      ),
                     ),
                   ),
                 ],

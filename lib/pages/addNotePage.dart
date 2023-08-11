@@ -29,8 +29,8 @@ class _addTaskPageState extends State<addNotePage> {
         
         ),
         body: Column(
-          children: [inputFieldBuilder(textController, "title"),
-          Expanded(child:inputFieldBuilder(descriptionController,"Description"))],
+          children: [inputFieldBuilder(textController, "Task Title"),
+          Expanded(child:inputFieldBuilder(descriptionController,"Task Description"))],
         ),
            floatingActionButton:FloatingActionButton(
         backgroundColor: Colors.orange,

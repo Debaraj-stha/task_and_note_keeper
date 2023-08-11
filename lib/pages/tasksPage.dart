@@ -31,8 +31,9 @@ class taskPage extends StatelessWidget {
               String title =task.title;
               String createdAt = task.createdAt;
               String id = task.id;
+              DateTime reminder = task.reminder!;
               return singleTask(
-                  createdAt: createdAt, title: title.length>30? title.substring(0, 30):title,id:id);
+                  createdAt: createdAt, title: title.length>30? title.substring(0, 30):title,id:id,reminder:reminder.toString(),);
             });
       }
     });

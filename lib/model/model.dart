@@ -17,13 +17,13 @@ class Tasks{
   String title;
   String createdAt;
   String id;
-  String?reminder;
+DateTime? reminder;
   Tasks({required this.createdAt,required this.title,required this.id,this.reminder,});
-  factory Tasks.fromJson(Map<String,dynamic> json)=>Tasks(id:json['id'],createdAt: json['createdAt'], title:json['title'],reminder:json['reminder']);
+  factory Tasks.fromJson(Map<String,dynamic> json)=>Tasks(id:json['id'],createdAt: json['createdAt'], title:json['title'],reminder: json['reminder'] != "0" ? DateTime.parse(json['reminder']) : null,);
   Map<String,dynamic> toJson()=>{
     "title":title,
     "id":id,
     "createdAt":createdAt,
-    "reminder":reminder,
+    "reminder":reminder==null?"0":reminder!.toIso8601String(),
   };
 }
