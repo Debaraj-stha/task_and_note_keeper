@@ -22,7 +22,8 @@ class singleTask extends StatelessWidget {
     debugPrint(DateTime.now().toString());
     final p = Provider.of<provider>(context, listen: false);
     final now = DateTime.now();
-final date=DateTime.parse(reminder);
+    
+    final date=DateTime.parse(reminder);
     debugPrint("reminder"+reminder);
     if(date==now)
     p.scheduleReminder(date);

@@ -21,7 +21,8 @@ class _myHomePageState extends State<myHomePage> {
   @override
   Widget build(BuildContext context) {
     final p = Provider.of<provider>(context, listen: false);
-
+  p.titleFocus.unfocus();
+  p.descriptionFocus.unfocus();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: appBar(),

@@ -22,7 +22,8 @@ class _updateTaskPageState extends State<updateNotePage> {
   Widget build(BuildContext context) {
       final p = Provider.of<provider>(context, listen: false);
     final textController = p.titleController;
-
+final titleFocus=p.titleFocus;
+final descriptionFocus=p.descriptionFocus;
     final descriptionController = p.descriptionController;
     textController.text=widget.title;
     descriptionController.text=widget.description;
@@ -34,26 +35,28 @@ class _updateTaskPageState extends State<updateNotePage> {
         
         ),
         body: Column(
-          children: [inputFieldBuilder(textController, "title"),
-          Expanded(child:inputFieldBuilder(descriptionController,"Description"))],
+          children: [inputFieldBuilder(textController, "title",titleFocus),
+          Expanded(child:inputFieldBuilder(descriptionController,"Description",descriptionFocus))],
         ),
            floatingActionButton:FloatingActionButton(
         backgroundColor: Colors.orange,
         onPressed: (){
           Notes note=Notes(createdAt: widget.createdAt,id:widget.id,title:textController.text,description: descriptionController.text);
          p.updateNote(note, widget.id, context);
+         p.descriptionFocus.unfocus();
+         p.titleFocus.unfocus();
       },child: Icon(Icons.save) ,),
     );
   }
 }
-Widget inputFieldBuilder(TextEditingController controller,String hint) {
+Widget inputFieldBuilder(TextEditingController controller,String hint,FocusNode focusNode) {
     return Container(
       margin: EdgeInsets.all(10),
       padding: EdgeInsets.all(10),
       child: Card(
         margin: EdgeInsets.all(6),
           child: TextFormField(
-            
+            focusNode: focusNode,
         controller: controller,
       cursorColor: Colors.black,
         decoration: InputDecoration(

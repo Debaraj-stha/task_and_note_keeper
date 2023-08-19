@@ -14,6 +14,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'dart:async';
 
 class provider with ChangeNotifier {
   TextEditingController titleController = new TextEditingController();
@@ -27,18 +28,37 @@ class provider with ChangeNotifier {
   List<String> selectedId = [];
   Map<String, dynamic> isCheckedNotes = {};
   dbController? _dbController;
-  FocusNode focusNode = FocusNode();
+  FocusNode titleFocus= FocusNode();
+  FocusNode descriptionFocus= FocusNode();
   int currentPage = 0;
   bool isUpdate = false;
   DateTime setReminder = DateTime(2023, 08, 11, 6, 30);
   var uuid = Uuid();
   final player = AudioPlayer();
   bool issetReminder = false;
+  late Timer _typingTimer;
   initialize() {
     _dbController = dbController();
+    _typingTimer = Timer(Duration(seconds: 3), () {
+        if (titleFocus.hasFocus||descriptionFocus.hasFocus) {
+        titleFocus.unfocus();
+        descriptionFocus.unfocus();
+      }
+    });
+  }
+
+  void resetTimer() {
+    _typingTimer.cancel();
+    _typingTimer = Timer(Duration(seconds: 3), () {
+      if (titleFocus.hasFocus||descriptionFocus.hasFocus) {
+        titleFocus.unfocus();
+        descriptionFocus.unfocus();
+      }
+    });
   }
 
   void dispose() {
+    _typingTimer.cancel();
     titleController.dispose();
     descriptionController.dispose();
     pageController.dispose();
@@ -118,7 +138,8 @@ class provider with ChangeNotifier {
           message("Task added successfully");
           loadTasks();
           taskController.clear();
-          focusNode.unfocus();
+         titleFocus.unfocus();
+         descriptionFocus.unfocus();
         }
       });
     } catch (e) {
@@ -156,6 +177,7 @@ class provider with ChangeNotifier {
   }
 
   displayBottomSheet(BuildContext context) {
+    initialize();
     return showDialog(
         context: context,
         builder: (context) {
@@ -168,10 +190,13 @@ class provider with ChangeNotifier {
                       topLeft: Radius.circular(10),
                       topRight: Radius.circular(10))),
               child: TextFormField(
+                onChanged: (value){
+                  resetTimer();
+                },
                 controller: taskController,
                 cursorColor: Colors.orange,
                 maxLines: 4,
-                focusNode: focusNode,
+                focusNode: titleFocus,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: "Type Task here...",
@@ -208,7 +233,7 @@ class provider with ChangeNotifier {
                           id: id,
                           reminder: reminder);
                       insertTask(task, context);
-                      focusNode.unfocus();
+                      titleFocus.unfocus();
                     },
                   )
                 ],
@@ -220,6 +245,7 @@ class provider with ChangeNotifier {
 
   showUpdateTaskModal(
       String createdAt, String id, String reminder, BuildContext context) {
+        initialize();
     return showDialog(
         context: context,
         builder: (context) {
@@ -232,7 +258,11 @@ class provider with ChangeNotifier {
                 pickDate(context);
               },
               icon: customText(
-                  text: reminder != null ? issetReminder?setReminder.toIso8601String() : reminder : "set Reminder"),
+                  text: reminder != null
+                      ? issetReminder
+                          ? setReminder.toString()
+                          : reminder
+                      : "set Reminder"),
               color: Colors.white,
             ),
             content: Container(
@@ -243,10 +273,11 @@ class provider with ChangeNotifier {
                       topLeft: Radius.circular(10),
                       topRight: Radius.circular(10))),
               child: TextFormField(
+                
                 controller: taskController,
                 cursorColor: Colors.orange,
                 maxLines: 4,
-                focusNode: focusNode,
+                focusNode: titleFocus,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: "Type here...",
@@ -281,7 +312,7 @@ class provider with ChangeNotifier {
                           reminder:
                               issetReminder ? setReminder : DateTime.now());
                       updateTask(task, id, context);
-                      focusNode.unfocus();
+                      titleFocus.unfocus();
                     },
                   )
                 ],
@@ -437,7 +468,7 @@ class provider with ChangeNotifier {
   void scheduleReminder(DateTime time) async {
 // Get the desired time zone
     String timeZoneName =
-        "Asia/Kathmandu" ;// Replace with your desired time zone
+        "Asia/Kathmandu"; // Replace with your desired time zone
     Location timeZone = getLocation(timeZoneName);
 
 // Convert DateTime to TZDateTime
