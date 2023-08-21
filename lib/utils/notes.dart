@@ -21,7 +21,26 @@ class notes extends StatelessWidget {
       } else if (value.notes.length == 0) {
         return Center(child: CircularProgressIndicator());
       } else {
-        return    ListView.builder(
+        if(value.filteredNotes.isNotEmpty){
+ return    ListView.builder(
+        padding: EdgeInsets.all(10),
+        itemCount: value.filteredNotes.length,
+        itemBuilder: (context, index) {
+          final note=value.filteredNotes[index];
+          String title = note.title;
+          String description =note.description;
+          String createdAt = note.createdAt.toString();
+          String id=note.id;
+          return singleNote(
+            id:id,
+            title: title,
+            description: description,
+            createdAt: createdAt,
+          );
+        });
+        }
+        else{
+          return    ListView.builder(
         padding: EdgeInsets.all(10),
         itemCount: value.notes.length,
         itemBuilder: (context, index) {
@@ -37,6 +56,7 @@ class notes extends StatelessWidget {
             createdAt: createdAt,
           );
         });
+      }
       }
     });
  

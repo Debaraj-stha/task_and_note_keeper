@@ -28,19 +28,21 @@ class provider with ChangeNotifier {
   List<String> selectedId = [];
   Map<String, dynamic> isCheckedNotes = {};
   dbController? _dbController;
-  FocusNode titleFocus= FocusNode();
-  FocusNode descriptionFocus= FocusNode();
+  FocusNode titleFocus = FocusNode();
+  FocusNode descriptionFocus = FocusNode();
   int currentPage = 0;
   bool isUpdate = false;
   DateTime setReminder = DateTime(2023, 08, 11, 6, 30);
+  TextEditingController searchcontroller = TextEditingController();
+  FocusNode searchNode = FocusNode();
   var uuid = Uuid();
   final player = AudioPlayer();
   bool issetReminder = false;
   late Timer _typingTimer;
   initialize() {
     _dbController = dbController();
-    _typingTimer = Timer(Duration(seconds: 3), () {
-        if (titleFocus.hasFocus||descriptionFocus.hasFocus) {
+    _typingTimer = Timer(Duration(seconds: 5), () {
+      if (titleFocus.hasFocus || descriptionFocus.hasFocus) {
         titleFocus.unfocus();
         descriptionFocus.unfocus();
       }
@@ -50,8 +52,11 @@ class provider with ChangeNotifier {
   void resetTimer() {
     _typingTimer.cancel();
     _typingTimer = Timer(Duration(seconds: 3), () {
-      if (titleFocus.hasFocus||descriptionFocus.hasFocus) {
+      if (titleFocus.hasFocus ||
+          descriptionFocus.hasFocus ||
+          searchNode.hasFocus) {
         titleFocus.unfocus();
+        searchNode.unfocus();
         descriptionFocus.unfocus();
       }
     });
@@ -61,6 +66,7 @@ class provider with ChangeNotifier {
     _typingTimer.cancel();
     titleController.dispose();
     descriptionController.dispose();
+    searchcontroller.dispose();
     pageController.dispose();
   }
 
@@ -138,8 +144,8 @@ class provider with ChangeNotifier {
           message("Task added successfully");
           loadTasks();
           taskController.clear();
-         titleFocus.unfocus();
-         descriptionFocus.unfocus();
+          titleFocus.unfocus();
+          descriptionFocus.unfocus();
         }
       });
     } catch (e) {
@@ -190,7 +196,7 @@ class provider with ChangeNotifier {
                       topLeft: Radius.circular(10),
                       topRight: Radius.circular(10))),
               child: TextFormField(
-                onChanged: (value){
+                onChanged: (value) {
                   resetTimer();
                 },
                 controller: taskController,
@@ -245,7 +251,7 @@ class provider with ChangeNotifier {
 
   showUpdateTaskModal(
       String createdAt, String id, String reminder, BuildContext context) {
-        initialize();
+    initialize();
     return showDialog(
         context: context,
         builder: (context) {
@@ -273,7 +279,6 @@ class provider with ChangeNotifier {
                       topLeft: Radius.circular(10),
                       topRight: Radius.circular(10))),
               child: TextFormField(
-                
                 controller: taskController,
                 cursorColor: Colors.orange,
                 maxLines: 4,
@@ -510,5 +515,38 @@ class provider with ChangeNotifier {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => myHomePage()));
     debugPrint('Notification tapped');
+  }
+
+  List<Notes> filteredNotes = [];
+  List<Tasks> filteredTasks = [];
+  void filterNote(String query) {
+    filteredNotes.clear();
+    if (query.isEmpty) {
+      filteredNotes.addAll(_notes);
+    } else {
+      String queryToLower = query.toLowerCase();
+      filteredNotes.addAll(_notes.where((element) {
+        final String lowerTitle = element.title.toLowerCase();
+        final String lowerDescription = element.description.toLowerCase();
+        return lowerTitle.contains(queryToLower) ||
+            lowerDescription.contains(queryToLower);
+      }));
+    }
+    notifyListeners();
+  }
+
+  void filterTask(String query) {
+    filteredTasks.clear();
+    if (query.isEmpty) {
+      filteredTasks.addAll(_tasks);
+    } else {
+      String queryToLower = query.toLowerCase();
+      filteredTasks.addAll(_tasks.where((element) {
+        final String lowerTitle = element.title.toLowerCase();
+
+        return lowerTitle.contains(queryToLower);
+      }));
+    }
+    notifyListeners();
   }
 }

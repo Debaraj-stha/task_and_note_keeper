@@ -23,6 +23,21 @@ class taskPage extends StatelessWidget {
           child: CircularProgressIndicator(),
         );
       } else {
+        if(value.filteredTasks.isNotEmpty){
+            return ListView.builder(
+            padding: EdgeInsets.all(10),
+            itemCount: value.filteredTasks.length,
+            itemBuilder: (context, index) {
+              final task=value.filteredTasks[index];
+              String title =task.title;
+              String createdAt = task.createdAt;
+              String id = task.id;
+              DateTime reminder = task.reminder!;
+              return singleTask(
+                  createdAt: createdAt, title: title.length>30? title.substring(0, 30):title,id:id,reminder:reminder.toString(),);
+            });
+        }
+        else{
         return ListView.builder(
             padding: EdgeInsets.all(10),
             itemCount: value.tasks.length,
@@ -35,6 +50,7 @@ class taskPage extends StatelessWidget {
               return singleTask(
                   createdAt: createdAt, title: title.length>30? title.substring(0, 30):title,id:id,reminder:reminder.toString(),);
             });
+        }
       }
     });
   }

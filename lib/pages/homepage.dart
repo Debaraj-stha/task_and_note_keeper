@@ -19,20 +19,30 @@ class myHomePage extends StatefulWidget {
 
 class _myHomePageState extends State<myHomePage> {
   @override
+  void dispose() {
+    // TODO: implement dispose
+    Provider.of<provider>(context, listen: false).dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final p = Provider.of<provider>(context, listen: false);
-  p.titleFocus.unfocus();
-  p.descriptionFocus.unfocus();
+    p.titleFocus.unfocus();
+    p.descriptionFocus.unfocus();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: appBar(),
       body: Stack(children: [
-        PageView(
-          controller: p.pageController,
-          onPageChanged: (val) {
-            p.handlePageChange();
-          },
-          children: [notes(), taskPage()],
+        Positioned.fill(
+          top: 50,
+          child: PageView(
+            controller: p.pageController,
+            onPageChanged: (val) {
+              p.handlePageChange();
+            },
+            children: [notes(), taskPage()],
+          ),
         ),
         Consumer<provider>(builder: (context, value, child) {
           return value.selectedId.length > 0
@@ -44,10 +54,9 @@ class _myHomePageState extends State<myHomePage> {
                       alignment: Alignment.center,
                       child: IconButton(
                           onPressed: () {
-                            if(p.currentPage == 0){
-                            p.deleteNotes();
-                            }
-                            else{
+                            if (p.currentPage == 0) {
+                              p.deleteNotes();
+                            } else {
                               p.deleteTasks();
                             }
                           },
@@ -59,17 +68,50 @@ class _myHomePageState extends State<myHomePage> {
                     ),
                   ))
               : Container();
-        })
+        }),
+        Positioned(
+          top: 0,
+          left: 0,
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 10),
+            height: 50,
+            // color: Colors.grey,
+            width: MediaQuery.of(context).size.width,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: BorderSide(color: Colors.black),
+              ),
+              child: TextFormField(
+                style: TextStyle(color: Colors.black),
+                controller: p.searchcontroller,
+                focusNode: p.searchNode,
+                onChanged: (value) {
+                  if (p.currentPage == 0)
+                    p.filterNote(value);
+                  else {
+                    p.filterTask(value);
+                  }
+                  p.resetTimer();
+                },
+                decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(left: 10, right: 10),
+                    border: InputBorder.none,
+                    hintText: "Search here...",
+                    hintStyle: TextStyle(color: Colors.black)),
+              ),
+            ),
+          ),
+        )
       ]),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.orange,
         onPressed: () {
-          if(p.currentPage==0){
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => addNotePage()));
-          }
-          else{
-p.displayBottomSheet(context);
+          if (p.currentPage == 0) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => addNotePage()));
+          } else {
+            p.displayBottomSheet(context);
           }
         },
         child: customText(
